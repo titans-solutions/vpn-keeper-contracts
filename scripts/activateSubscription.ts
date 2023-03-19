@@ -6,7 +6,7 @@ export async function run(provider: NetworkProvider) {
     const ui = provider.ui();
 
     const config: SubscriptionConfig = {
-        masterAddress: provider.sender().address!,
+        serviceProviderAddress: provider.sender().address!,
         pricePerDay: toNano('0.01'),
         paidUntil: 0,
     }

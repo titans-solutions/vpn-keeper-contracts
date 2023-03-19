@@ -3,13 +3,16 @@
 const op::activate = "op::activate"c;
 
 ;; storage variables
-global slice master_address;
+global slice service_provider_address;
+global slice client_address;
 global int price_per_day;
 global int paid_until;
 
+
 () load_data() impure inline {
   var ds = get_data().begin_parse();
-  master_address = ds~load_msg_addr();
+  service_provider_address = ds~load_msg_addr();
+  client_address = ds~load_msg_addr();
   price_per_day = ds~load_uint(64);
   paid_until = ds~load_uint(32);
   ds.end_parse();
@@ -19,7 +22,8 @@ global int paid_until;
 () save_data() impure inline {
     set_data(
         begin_cell()
-            .store_slice(master_address)
+            .store_slice(service_provider_address)
+            .store_slice(client_address)
             .store_uint(price_per_day, 64)
             .store_uint(paid_until, 32)
             .end_cell()
@@ -64,7 +68,7 @@ global int paid_until;
     ;; send paid amount to the master address
     var msg = begin_cell()
             .store_uint(0x10, 6)
-            .store_slice(master_address)
+            .store_slice(service_provider_address)
             .store_grams(0)
             .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
             .end_cell();
@@ -86,4 +90,9 @@ int get_price_per_day() method_id {
 int get_paid_until() method_id {
   load_data();
   return paid_until;
+}
+
+slice get_client_address() method_id {
+  load_data();
+  return client_address;
 }

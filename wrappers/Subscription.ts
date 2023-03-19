@@ -1,14 +1,16 @@
 import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode } from 'ton-core';
 
 export type SubscriptionConfig = {
-    masterAddress: Address;
+    serviceProviderAddress: Address;
+    clientAddress: Address;
     pricePerDay: bigint;
     paidUntil: number;
 };
 
 export function subscriptionConfigToCell(config: SubscriptionConfig): Cell {
     return beginCell()
-        .storeAddress(config.masterAddress)
+        .storeAddress(config.serviceProviderAddress)
+        .storeAddress(config.clientAddress)
         .storeUint(config.pricePerDay, 64)
         .storeUint(config.paidUntil, 32)
         .endCell();
@@ -61,5 +63,10 @@ export class Subscription implements Contract {
     async getPaidUntil(provider: ContractProvider) {
         const result = await provider.get('get_paid_until', []);
         return result.stack.readNumber();
+    }
+
+    async getClientAddress(provider: ContractProvider) {
+        const result = await provider.get('get_client_address', []);
+        return result.stack.readAddress();
     }
 }
